@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tab Test</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        /* Tabs styling */
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab-btn {
+            padding: 10px 20px;
+            margin-right: 5px;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            border-radius: 5px 5px 0 0;
+            background-color: #f5f5f5;
+            color: #333;
+            cursor: pointer;
+        }
+        
+        .tab-btn.active {
+            background-color: white;
+            border-bottom: 2px solid white;
+            font-weight: bold;
+            position: relative;
+            top: 1px;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-top: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Tab Testing</h1>
+        
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="tab1">Tab 1</button>
+            <button class="tab-btn" data-tab="tab2">Tab 2</button>
+            <button class="tab-btn" data-tab="tab3">Tab 3</button>
+        </div>
+        
+        <div id="tab1" class="tab-content active">
+            <h2>Content of Tab 1</h2>
+            <p>This is the content of tab 1. If you can see this, tab 1 is active.</p>
+        </div>
+        
+        <div id="tab2" class="tab-content">
+            <h2>Content of Tab 2</h2>
+            <p>This is the content of tab 2. If you can see this, tab 2 is active.</p>
+        </div>
+        
+        <div id="tab3" class="tab-content">
+            <h2>Content of Tab 3</h2>
+            <p>This is the content of tab 3. If you can see this, tab 3 is active.</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    console.log('Tab button clicked:', btn.getAttribute('data-tab'));
+                    
+                    // Remove active class from all buttons and contents
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    // Add active class to clicked button and corresponding content
+                    btn.classList.add('active');
+                    const tabId = btn.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
