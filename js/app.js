@@ -89,9 +89,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${endTime}</td>
                 <td>${event.location || 'N/A'}</td>
                 <td>${event.description || 'N/A'}</td>
+                <td>
+                    <button class="add-to-gcal-btn" data-event-id="${event.uid}">Add to Google Calendar</button>
+                </td>
             `;
             
             eventsBody.appendChild(row);
+            
+            // Add event listener to the Google Calendar button
+            const addToGcalBtn = row.querySelector('.add-to-gcal-btn');
+            addToGcalBtn.addEventListener('click', () => openEventInGoogleCalendar(event));
         });
 
         // Show the results section
@@ -376,5 +383,48 @@ document.addEventListener('DOMContentLoaded', () => {
     function formatTime(dateTime) {
         const date = dateTime.toJSDate();
         return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    
+    function openEventInGoogleCalendar(event) {
+        try {
+            // Base Google Calendar URL
+            let googleCalUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE';
+            
+            // Get event details
+            const title = encodeURIComponent(event.summary || 'Untitled Event');
+            
+            // Format dates for Google Calendar
+            const startDate = event.startDate.toJSDate();
+            const endDate = event.endDate.toJSDate();
+            
+            // Format: YYYYMMDDTHHMMSS/YYYYMMDDTHHMMSS
+            const dateFormat = date => {
+                return date.toISOString().replace(/-|:|\.\d+/g, '');
+            };
+            
+            const dates = encodeURIComponent(`${dateFormat(startDate)}/${dateFormat(endDate)}`);
+            
+            // Add location if available
+            let location = '';
+            if (event.location) {
+                location = `&location=${encodeURIComponent(event.location)}`;
+            }
+            
+            // Add description if available
+            let description = '';
+            if (event.description) {
+                description = `&details=${encodeURIComponent(event.description)}`;
+            }
+            
+            // Construct the final URL
+            googleCalUrl += `&text=${title}&dates=${dates}${location}${description}`;
+            
+            // Open Google Calendar in a new tab
+            window.open(googleCalUrl, '_blank');
+            
+        } catch (error) {
+            console.error('Error opening event in Google Calendar:', error);
+            alert(`Error opening event in Google Calendar: ${error.message || 'Unknown error'}`);
+        }
     }
 });

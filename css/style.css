@@ -166,6 +166,23 @@ button:hover {
     background-color: #0b8043;
 }
 
+.add-to-gcal-btn {
+    background-color: #4285f4;
+    padding: 6px 8px;
+    font-size: 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: auto;
+    white-space: nowrap;
+}
+
+.add-to-gcal-btn:hover {
+    background-color: #3367d6;
+}
+
 .filtered-row {
     display: none;
 }

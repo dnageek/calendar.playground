@@ -7,8 +7,10 @@ A simple web application that allows users to upload Google Calendar ICS files a
 - Upload and parse Google Calendar ICS files
 - Display calendar events in a sortable table
 - Show event details including title, start/end times, location, and description
-- Filter events by date and event name
+- Filter events by date range (start date to end date)
+- Filter events by name (include events containing the keyword)
 - Export filtered events to a new ICS file
+- Open filtered events directly in Google Calendar
 
 ## Usage
 
