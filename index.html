@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar Viewer</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Calendar Event Viewer</h1>
+        <div class="upload-section">
+            <label for="ics-file">Upload your Google Calendar ICS file:</label>
+            <input type="file" id="ics-file" accept=".ics">
+        </div>
+        <div class="results-section hidden" id="results-section">
+            <h2>Calendar Events</h2>
+            <div class="filter-section">
+                <div class="filter-group">
+                    <label for="filter-date-start">Date Range:</label>
+                    <div class="date-range">
+                        <input type="date" id="filter-date-start" placeholder="Start date">
+                        <span>to</span>
+                        <input type="date" id="filter-date-end" placeholder="End date">
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <label for="filter-event">Filter by Event Name:</label>
+                    <input type="text" id="filter-event" placeholder="Enter event name...">
+                </div>
+                <button id="apply-filters">Apply Filters</button>
+                <button id="clear-filters">Clear Filters</button>
+                <button id="export-filtered" class="export-btn">Export Filtered Events</button>
+            </div>
+            <div class="table-container">
+                <table id="events-table">
+                    <thead>
+                        <tr>
+                            <th>Event</th>
+                            <th>Start Date</th>
+                            <th>Start Time</th>
+                            <th>End Date</th>
+                            <th>End Time</th>
+                            <th>Location</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody id="events-body">
+                        <!-- Events will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include ical.js for parsing ICS files -->
+    <script src="https://cdn.jsdelivr.net/npm/ical.js@1.5.0/build/ical.min.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
