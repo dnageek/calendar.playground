@@ -28,6 +28,23 @@
                     <label for="filter-event">Filter by Event Name:</label>
                     <input type="text" id="filter-event" placeholder="Enter event name...">
                 </div>
+                <div class="filter-group">
+                    <label for="filter-duration">Event Duration:</label>
+                    <div class="duration-filter">
+                        <select id="filter-duration-op">
+                            <option value="none">None</option>
+                            <option value="lt">Less than</option>
+                            <option value="gt">Greater than</option>
+                            <option value="eq">Equal to</option>
+                        </select>
+                        <input type="number" id="filter-duration-value" min="1" value="60" placeholder="Duration">
+                        <select id="filter-duration-unit">
+                            <option value="minutes">Minutes</option>
+                            <option value="hours">Hours</option>
+                            <option value="days">Days</option>
+                        </select>
+                    </div>
+                </div>
                 <button id="apply-filters">Apply Filters</button>
                 <button id="clear-filters">Clear Filters</button>
                 <button id="export-filtered" class="export-btn">Export Filtered Events</button>
@@ -43,6 +60,7 @@
                             <th>End Time</th>
                             <th>Location</th>
                             <th>Description</th>
+                            <th>Duration</th>
                             <th>Actions</th>
                         </tr>
                     </thead>

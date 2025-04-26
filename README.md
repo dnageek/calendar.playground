@@ -9,8 +9,9 @@ A simple web application that allows users to upload Google Calendar ICS files a
 - Show event details including title, start/end times, location, and description
 - Filter events by date range (start date to end date)
 - Filter events by name (include events containing the keyword)
+- Filter events by duration (less than, greater than, or equal to)
 - Export filtered events to a new ICS file
-- Open filtered events directly in Google Calendar
+- Add individual events directly to Google Calendar
 
 ## Usage
 

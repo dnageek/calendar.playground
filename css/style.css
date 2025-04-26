@@ -133,6 +133,31 @@ table tr:hover {
     color: #666;
 }
 
+.duration-filter {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.duration-filter select,
+.duration-filter input {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.duration-filter input {
+    width: 80px;
+}
+
+.duration-filter select:first-child {
+    min-width: 120px;
+}
+
+.duration-filter select:last-child {
+    min-width: 100px;
+}
+
 button {
     padding: 8px 16px;
     background-color: #4285f4;

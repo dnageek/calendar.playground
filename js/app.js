@@ -5,6 +5,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const filterDateStart = document.getElementById('filter-date-start');
     const filterDateEnd = document.getElementById('filter-date-end');
     const filterEvent = document.getElementById('filter-event');
+    const filterDurationOp = document.getElementById('filter-duration-op');
+    const filterDurationValue = document.getElementById('filter-duration-value');
+    const filterDurationUnit = document.getElementById('filter-duration-unit');
     const applyFiltersBtn = document.getElementById('apply-filters');
     const clearFiltersBtn = document.getElementById('clear-filters');
     const exportFilteredBtn = document.getElementById('export-filtered');
@@ -76,9 +79,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const endDate = formatDate(event.endDate);
             const endTime = formatTime(event.endDate);
             
-            // Store ISO date for filtering
+            // Calculate and format event duration
+            const durationText = formatDuration(event.startDate, event.endDate);
+            
+            // Store ISO date and duration for filtering
             row.dataset.startDate = event.startDate.toJSDate().toISOString().split('T')[0];
             row.dataset.summary = event.summary || '';
+            row.dataset.duration = event.endDate.toJSDate().getTime() - event.startDate.toJSDate().getTime();
             
             // Create the table row with event details
             row.innerHTML = `
@@ -89,6 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${endTime}</td>
                 <td>${event.location || 'N/A'}</td>
                 <td>${event.description || 'N/A'}</td>
+                <td>${formatDuration(event.startDate, event.endDate)}</td>
                 <td>
                     <button class="add-to-gcal-btn" data-event-id="${event.uid}">Add to Google Calendar</button>
                 </td>
@@ -109,17 +117,41 @@ document.addEventListener('DOMContentLoaded', () => {
         const startDateValue = filterDateStart.value;
         const endDateValue = filterDateEnd.value;
         const eventValue = filterEvent.value.toLowerCase().trim();
+        const durationOp = filterDurationOp.value;
+        const durationValue = parseInt(filterDurationValue.value, 10);
+        const durationUnit = filterDurationUnit.value;
         
         // If no filters are applied, show all events
-        if (!startDateValue && !endDateValue && !eventValue) {
+        if (!startDateValue && !endDateValue && !eventValue && durationOp === 'none') {
             clearFilters();
             return;
+        }
+        
+        // Calculate milliseconds for duration comparison
+        let durationMs = 0;
+        if (durationOp !== 'none') {
+            switch (durationUnit) {
+                case 'minutes':
+                    durationMs = durationValue * 60 * 1000;
+                    break;
+                case 'hours':
+                    durationMs = durationValue * 60 * 60 * 1000;
+                    break;
+                case 'days':
+                    durationMs = durationValue * 24 * 60 * 60 * 1000;
+                    break;
+            }
         }
         
         // Filter the events based on the criteria
         filteredEvents = allEvents.filter(event => {
             const eventDate = event.startDate.toJSDate().toISOString().split('T')[0];
             const eventName = (event.summary || '').toLowerCase();
+            
+            // Calculate event duration in milliseconds
+            const startMs = event.startDate.toJSDate().getTime();
+            const endMs = event.endDate.toJSDate().getTime();
+            const eventDurationMs = endMs - startMs;
             
             // Date range filtering
             let dateMatches = true;
@@ -134,9 +166,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 dateMatches = eventDate <= endDateValue;
             }
             
+            // Event name filtering
             const nameMatches = !eventValue || eventName.includes(eventValue);
             
-            return dateMatches && nameMatches;
+            // Duration filtering
+            let durationMatches = true;
+            if (durationOp !== 'none' && !isNaN(durationValue)) {
+                switch (durationOp) {
+                    case 'lt':
+                        durationMatches = eventDurationMs < durationMs;
+                        break;
+                    case 'gt':
+                        durationMatches = eventDurationMs > durationMs;
+                        break;
+                    case 'eq':
+                        // Allow a small margin (5%) for 'equal to' to account for minor differences
+                        const margin = durationMs * 0.05;
+                        durationMatches = Math.abs(eventDurationMs - durationMs) <= margin;
+                        break;
+                }
+            }
+            
+            return dateMatches && nameMatches && durationMatches;
         });
         
         // Update the table to show only filtered events
@@ -152,6 +203,9 @@ document.addEventListener('DOMContentLoaded', () => {
         filterDateStart.value = '';
         filterDateEnd.value = '';
         filterEvent.value = '';
+        filterDurationOp.value = 'none';
+        filterDurationValue.value = '60';
+        filterDurationUnit.value = 'minutes';
         filteredEvents = [...allEvents];
         displayEvents(allEvents);
     }
@@ -383,6 +437,25 @@ document.addEventListener('DOMContentLoaded', () => {
     function formatTime(dateTime) {
         const date = dateTime.toJSDate();
         return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    
+    function formatDuration(startDateTime, endDateTime) {
+        const startMs = startDateTime.toJSDate().getTime();
+        const endMs = endDateTime.toJSDate().getTime();
+        const durationMs = endMs - startMs;
+        
+        const seconds = Math.floor(durationMs / 1000);
+        const minutes = Math.floor(seconds / 60);
+        const hours = Math.floor(minutes / 60);
+        const days = Math.floor(hours / 24);
+        
+        if (days > 0) {
+            return `${days} day${days !== 1 ? 's' : ''} ${hours % 24} hr`;
+        } else if (hours > 0) {
+            return `${hours} hr ${minutes % 60} min`;
+        } else {
+            return `${minutes} min`;
+        }
     }
     
     function openEventInGoogleCalendar(event) {
