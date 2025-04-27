@@ -2,7 +2,14 @@
 
 A versatile web application for managing calendar events with both viewing and AI-assisted creation capabilities.
 
-The app is made with Claude code for fun, the total cost of the app is about seven dollars
+## Notes about this app
+
+The app was entirely made with Claude code for fun, the total cost of the app charged by Claude was about seven dollars.
+
+Why this app (other than testing claude code):
+
+- A local after school center has both longer afterschool and daycare programs and shorter focused sessions. They provided a google calendar file for all the events in a single ics file, of which most contents are the longer sessions which happen almost all day, meaning it doesn't make sense to add them in our calendar. Previously, I just used shell script to parse the file to grep the lines for the ones I wanted to import in google. The first tab was created for this purpose
+- The 2nd and 3rd tab are to quickly add some events without clicking around google calendar, I remember google had this function but I can not find it now. The 2nd tab uses openAI api, while the 3rd tab uses puter.js. Hopefully the puter.js stays free (thanks to its free api services!)
 
 The app can be accessed at: https://dnageek.github.io/calendar.playground/
 
