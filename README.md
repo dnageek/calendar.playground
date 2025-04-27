@@ -2,6 +2,10 @@
 
 A versatile web application for managing calendar events with both viewing and AI-assisted creation capabilities.
 
+The app is made with Claude code for fun, the total cost of the app is about seven dollars
+
+The app can be accessed at: https://dnageek.github.io/calendar.playground/
+
 ## Features
 
 ### Calendar Viewer
@@ -18,6 +22,15 @@ A versatile web application for managing calendar events with both viewing and A
 - Uses OpenAI API to intelligently parse event details
 - Extract event title, date, time, duration, and location
 - Local fallback parsing when API is unavailable
+- Export generated events to ICS files
+- Add generated events directly to Google Calendar
+
+### Puter.js Event Creator
+- Create calendar events using natural language with no API key required
+- Uses Puter.js to access advanced AI models (GPT-4o)
+- Same capabilities as the OpenAI version but with zero setup
+- No API keys or billing required
+- Seamless AI-powered event creation
 - Export generated events to ICS files
 - Add generated events directly to Google Calendar
 
@@ -40,6 +53,17 @@ A versatile web application for managing calendar events with both viewing and A
 4. Click "Generate Event"
 5. Review the generated event details
 6. Download as ICS or add to Google Calendar
+
+### Puter.js Event Creator
+1. Click the "Puter.js Creator" tab
+2. Enter a natural language description of your event
+   - Example: "Lunch with Sarah next Tuesday at noon for 1 hour"
+   - Example: "Team meeting in Conference Room B on Friday at 3pm for 2 hours"
+3. Click "Generate Event" (no API key needed!)
+4. Review the generated event details
+5. Download as ICS or add to Google Calendar
+
+**Note:** The Puter.js tab provides the same functionality as the AI Event Creator but doesn't require an API key. It's the recommended option for most users.
 
 ## How to Export Google Calendar ICS Files
 

@@ -13,6 +13,7 @@
         <div class="tabs">
             <button class="tab-btn active" data-tab="view-tab">Calendar Viewer</button>
             <button class="tab-btn" data-tab="create-tab">AI Event Creator</button>
+            <button class="tab-btn" data-tab="puter-tab">Puter.js Creator</button>
         </div>
         
         <div id="view-tab" class="tab-content active">
@@ -130,11 +131,60 @@
                 </div>
             </div>
         </div>
+        
+        <div id="puter-tab" class="tab-content">
+            <div class="puter-event-creator">
+                <h2>Puter.js Event Creator</h2>
+                <p>Create calendar events using natural language descriptions - no API key needed!</p>
+                
+                <div class="puter-input-section">
+                    <div class="input-group">
+                        <label for="puter-event-description">Describe your event:</label>
+                        <textarea id="puter-event-description" placeholder="Example: Team lunch at Italian restaurant on Friday at 1pm for 90 minutes"></textarea>
+                    </div>
+                    
+                    <button id="puter-generate-event" class="generate-btn">Generate Event</button>
+                </div>
+                
+                <div class="puter-result-section hidden" id="puter-result-section">
+                    <h3>Generated Event</h3>
+                    <div id="puter-loading-indicator" class="hidden">Processing... <div class="spinner"></div></div>
+                    
+                    <div class="table-container">
+                        <table id="puter-event-table">
+                            <thead>
+                                <tr>
+                                    <th>Event</th>
+                                    <th>Start Date</th>
+                                    <th>Start Time</th>
+                                    <th>End Date</th>
+                                    <th>End Time</th>
+                                    <th>Location</th>
+                                    <th>Description</th>
+                                    <th>Duration</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="puter-event-body">
+                                <!-- Puter.js generated event will appear here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="download-section">
+                        <button id="puter-download-event" class="download-btn">Download ICS File</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Include ical.js for parsing ICS files -->
     <script src="https://cdn.jsdelivr.net/npm/ical.js@1.5.0/build/ical.min.js"></script>
+    <!-- Include Puter.js for API-free AI access -->
+    <script src="https://js.puter.com/v2/"></script>
     <script src="js/app.js"></script>
     <script src="js/ai-event.js"></script>
+    <script src="js/puter-event.js"></script>
 </body>
 </html>
