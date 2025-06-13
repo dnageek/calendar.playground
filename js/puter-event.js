@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
             - If time is mentioned, use it; otherwise set a default time of 9:00 AM
             - If duration is mentioned, calculate the end time accordingly; otherwise set a default duration of 1 hour
             - If a date isn't specified at all, assume the event is for tomorrow
-            - The current date is ${new Date().toISOString().split('T')[0]}
+            - The current date is ${new Date().toLocaleDateString()}
             
             Event description: "${description}"
             
