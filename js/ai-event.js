@@ -458,25 +458,38 @@ document.addEventListener('DOMContentLoaded', () => {
     function generateICSFile(eventData) {
         // Get current timestamp for DTSTAMP
         const now = new Date();
-        const timestamp = formatICSDate(now);
-        
-        // Format dates for ICS
-        const start = formatICSDate(eventData.startDate);
-        const end = formatICSDate(eventData.endDate);
-        
+        const timestamp = formatICSDate(now, true); // DTSTAMP stays in UTC
+
+        // Get the user's timezone
+        const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+        // Format dates for ICS (without UTC Z suffix for local timezone dates)
+        const start = formatICSDate(eventData.startDate, false);
+        const end = formatICSDate(eventData.endDate, false);
+
+        // Get timezone abbreviation
+        const tzAbbr = new Intl.DateTimeFormat('en', {
+            timeZoneName: 'short',
+            timeZone: userTimezone
+        }).formatToParts(eventData.startDate).find(part => part.type === 'timeZoneName')?.value || '';
+
         // Generate a unique identifier
         const uid = `event-${now.getTime()}@calendar-assistant.app`;
-        
-        // Build the ICS content
+
+        // Build the ICS content with timezone information
         return `BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//Calendar Assistant//EN
 CALSCALE:GREGORIAN
 METHOD:PUBLISH
+BEGIN:VTIMEZONE
+TZID:${userTimezone}
+TZNAME:${tzAbbr}
+END:VTIMEZONE
 BEGIN:VEVENT
 SUMMARY:${eventData.summary}
-DTSTART:${start}
-DTEND:${end}
+DTSTART;TZID=${userTimezone}:${start}
+DTEND;TZID=${userTimezone}:${end}
 DTSTAMP:${timestamp}
 UID:${uid}
 LOCATION:${eventData.location || ''}
@@ -485,16 +498,17 @@ END:VEVENT
 END:VCALENDAR`;
     }
     
-    // Format date for ICS file (YYYYMMDDTHHMMSSZ)
-    function formatICSDate(date) {
+    // Format date for ICS file (YYYYMMDDTHHMMSS) with optional UTC 'Z' suffix
+    function formatICSDate(date, useUTC = true) {
         const year = date.getFullYear();
         const month = (date.getMonth() + 1).toString().padStart(2, '0');
         const day = date.getDate().toString().padStart(2, '0');
         const hours = date.getHours().toString().padStart(2, '0');
         const minutes = date.getMinutes().toString().padStart(2, '0');
         const seconds = date.getSeconds().toString().padStart(2, '0');
-        
-        return `${year}${month}${day}T${hours}${minutes}${seconds}Z`;
+
+        // Add Z suffix only for UTC times
+        return `${year}${month}${day}T${hours}${minutes}${seconds}${useUTC ? 'Z' : ''}`;
     }
     
     // Function to download ICS file
