@@ -94,23 +94,37 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Function to call OpenAI API
     async function getEventFromOpenAI(description, apiKey) {
+        // Get user's timezone information
+        const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
         const currentDate = new Date();
+        const currentDateTimeString = currentDate.toLocaleString('en-CA', { 
+            timeZone: userTimezone,
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+        });
+        
         const systemPrompt = `
             You are a calendar assistant that converts natural language descriptions into structured calendar events.
             Based on the user's description, extract the event details and return ONLY a JSON object with these fields:
             - summary: The title/summary of the event
-            - startDate: ISO date string for when the event starts, including time (in format: YYYY-MM-DDTHH:MM:SS)
-            - endDate: ISO date string for when the event ends, including time (in format: YYYY-MM-DDTHH:MM:SS)
+            - startDate: Date and time string in local timezone format (YYYY-MM-DD HH:MM:SS)
+            - endDate: Date and time string in local timezone format (YYYY-MM-DD HH:MM:SS)
             - location: Where the event takes place (if specified, otherwise empty string)
             - description: Any additional details about the event (if specified, otherwise empty string)
             
             For dates and times:
+            - All dates and times should be in the user's local timezone: ${userTimezone}
             - If a specific date is mentioned, use it
             - If only a day of week is mentioned (like "Monday"), use the next occurrence of that day
             - If time is mentioned, use it; otherwise set a default time of 9:00 AM
             - If duration is mentioned, calculate the end time accordingly; otherwise set a default duration of 1 hour
             - If a date isn't specified at all, assume the event is for tomorrow
-            - The current date is ${currentDate.toLocaleDateString()}
+            - The current date and time in the user's timezone is: ${currentDateTimeString}
             
             Return ONLY the JSON object, no additional text.
         `;
@@ -156,9 +170,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 // First try to parse as is
                 let eventData = JSON.parse(eventJSON);
                 
-                // Convert dates to Date objects
+                // Convert dates to Date objects in user's local timezone
+                // The AI should return dates in YYYY-MM-DD HH:MM:SS format for local timezone
                 eventData.startDate = new Date(eventData.startDate);
                 eventData.endDate = new Date(eventData.endDate);
+                
+                // Ensure dates are valid
+                if (isNaN(eventData.startDate.getTime()) || isNaN(eventData.endDate.getTime())) {
+                    throw new Error('Invalid date format received from OpenAI');
+                }
                 
                 return eventData;
             } catch (parseError) {
@@ -170,9 +190,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     try {
                         let eventData = JSON.parse(jsonMatch[0]);
                         
-                        // Convert dates to Date objects
+                        // Convert dates to Date objects in user's local timezone
                         eventData.startDate = new Date(eventData.startDate);
                         eventData.endDate = new Date(eventData.endDate);
+                        
+                        // Ensure dates are valid
+                        if (isNaN(eventData.startDate.getTime()) || isNaN(eventData.endDate.getTime())) {
+                            throw new Error('Invalid date format received from OpenAI');
+                        }
                         
                         return eventData;
                     } catch (e) {
