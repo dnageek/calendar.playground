@@ -170,20 +170,22 @@ document.addEventListener('DOMContentLoaded', () => {
             - summary: The title/summary of the event
             - startDate: Date and time string in ISO format (YYYY-MM-DDTHH:MM:SS)
             - endDate: Date and time string in ISO format (YYYY-MM-DDTHH:MM:SS)
-            - sourceTimezone: The timezone mentioned in the description (e.g., "GMT+8", "EST", "UTC", "America/New_York") or "local" if no specific timezone is mentioned
             - location: Where the event takes place (if specified, otherwise empty string)
             - description: Any additional details about the event (if specified, otherwise empty string)
+            
+            IMPORTANT - Timezone Conversion:
+            - If a timezone is mentioned in the event description (like "15:00 GMT+8", "3pm Pacific Time", "9am EST"), convert the time to the user's current timezone
+            - The user's current timezone is: ${userTimezone}
+            - The current date and time in the user's timezone is: ${currentDateTimeString}
+            - Always return startDate and endDate in the user's timezone (${userTimezone})
             
             For dates and times:
             - If a specific date is mentioned, use it
             - If only a day of week is mentioned (like "Monday"), use the next occurrence of that day
-            - If time is mentioned, use it exactly as specified along with any timezone information
+            - If time is mentioned with a timezone, convert it to ${userTimezone}
+            - If time is mentioned without a timezone, assume it's already in ${userTimezone}
             - If duration is mentioned, calculate the end time accordingly; otherwise set a default duration of 1 hour
             - If a date isn't specified at all, assume the event is for tomorrow
-            - If a timezone is mentioned (like GMT+8, EST, PST, etc.), capture it in sourceTimezone field
-            - If no timezone is mentioned, set sourceTimezone to "local"
-            - The current date and time in the user's timezone is: ${currentDateTimeString}
-            - The user's current timezone is: ${userTimezone}
             
             Event description: "${description}"
             
@@ -277,9 +279,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
                 
-                // Convert string dates to Date objects with proper timezone handling
-                eventData.startDate = convertToUserTimezone(eventData.startDate, eventData.sourceTimezone, userTimezone);
-                eventData.endDate = convertToUserTimezone(eventData.endDate, eventData.sourceTimezone, userTimezone);
+                // Convert string dates to Date objects (OpenAI has already converted to user timezone)
+                eventData.startDate = new Date(eventData.startDate);
+                eventData.endDate = new Date(eventData.endDate);
                 
                 // Ensure dates are valid
                 if (isNaN(eventData.startDate.getTime()) || isNaN(eventData.endDate.getTime())) {
