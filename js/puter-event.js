@@ -84,6 +84,69 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
+    // Function to convert timezone offset string to minutes
+    function parseTimezoneOffset(timezone) {
+        if (!timezone || timezone === 'local') {
+            return null; // Use local timezone
+        }
+        
+        // Handle GMT+X or GMT-X format
+        const gmtMatch = timezone.match(/GMT([+-])(\d{1,2})/i);
+        if (gmtMatch) {
+            const sign = gmtMatch[1] === '+' ? 1 : -1;
+            const hours = parseInt(gmtMatch[2], 10);
+            return sign * hours * 60; // Convert to minutes
+        }
+        
+        // Handle common timezone abbreviations
+        const timezoneMap = {
+            'EST': -5 * 60, 'EDT': -4 * 60,
+            'CST': -6 * 60, 'CDT': -5 * 60,
+            'MST': -7 * 60, 'MDT': -6 * 60,
+            'PST': -8 * 60, 'PDT': -7 * 60,
+            'UTC': 0, 'GMT': 0
+        };
+        
+        const upperTimezone = timezone.toUpperCase();
+        if (timezoneMap.hasOwnProperty(upperTimezone)) {
+            return timezoneMap[upperTimezone];
+        }
+        
+        return null; // If we can't parse it, use local timezone
+    }
+    
+    // Function to convert a date from source timezone to user's timezone
+    function convertToUserTimezone(dateString, sourceTimezone, userTimezone) {
+        // Parse the date string
+        const date = new Date(dateString);
+        
+        // If sourceTimezone is 'local' or null, assume it's already in user's timezone
+        if (!sourceTimezone || sourceTimezone === 'local') {
+            return date;
+        }
+        
+        // Get timezone offset in minutes
+        const sourceOffsetMinutes = parseTimezoneOffset(sourceTimezone);
+        if (sourceOffsetMinutes === null) {
+            return date; // If we can't parse the source timezone, return as-is
+        }
+        
+        // Get current user's timezone offset in minutes
+        const userOffsetMinutes = -date.getTimezoneOffset();
+        
+        // Calculate the difference and adjust
+        const offsetDifference = userOffsetMinutes - sourceOffsetMinutes;
+        
+        // Create new date with timezone adjustment
+        const adjustedDate = new Date(date.getTime() + (offsetDifference * 60 * 1000));
+        
+        console.log(`Converting from ${sourceTimezone} to ${userTimezone}:`);
+        console.log(`Original: ${date.toISOString()}`);
+        console.log(`Adjusted: ${adjustedDate.toISOString()}`);
+        
+        return adjustedDate;
+    }
+    
     // Process event description using Puter.js AI
     async function processPuterAI(description) {
         // Get user's timezone information
@@ -105,19 +168,22 @@ document.addEventListener('DOMContentLoaded', () => {
             You are a calendar assistant that converts natural language descriptions into structured calendar events.
             Parse the following event description and return ONLY a JSON object with these fields:
             - summary: The title/summary of the event
-            - startDate: Date and time string in local timezone format (YYYY-MM-DD HH:MM:SS)
-            - endDate: Date and time string in local timezone format (YYYY-MM-DD HH:MM:SS)
+            - startDate: Date and time string in ISO format (YYYY-MM-DDTHH:MM:SS)
+            - endDate: Date and time string in ISO format (YYYY-MM-DDTHH:MM:SS)
+            - sourceTimezone: The timezone mentioned in the description (e.g., "GMT+8", "EST", "UTC", "America/New_York") or "local" if no specific timezone is mentioned
             - location: Where the event takes place (if specified, otherwise empty string)
             - description: Any additional details about the event (if specified, otherwise empty string)
             
             For dates and times:
-            - All dates and times should be in the user's local timezone: ${userTimezone}
             - If a specific date is mentioned, use it
             - If only a day of week is mentioned (like "Monday"), use the next occurrence of that day
-            - If time is mentioned, use it; otherwise set a default time of 9:00 AM
+            - If time is mentioned, use it exactly as specified along with any timezone information
             - If duration is mentioned, calculate the end time accordingly; otherwise set a default duration of 1 hour
             - If a date isn't specified at all, assume the event is for tomorrow
+            - If a timezone is mentioned (like GMT+8, EST, PST, etc.), capture it in sourceTimezone field
+            - If no timezone is mentioned, set sourceTimezone to "local"
             - The current date and time in the user's timezone is: ${currentDateTimeString}
+            - The user's current timezone is: ${userTimezone}
             
             Event description: "${description}"
             
@@ -211,10 +277,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
                 
-                // Convert string dates to Date objects in user's local timezone
-                // The AI should return dates in YYYY-MM-DD HH:MM:SS format for local timezone
-                eventData.startDate = new Date(eventData.startDate);
-                eventData.endDate = new Date(eventData.endDate);
+                // Convert string dates to Date objects with proper timezone handling
+                eventData.startDate = convertToUserTimezone(eventData.startDate, eventData.sourceTimezone, userTimezone);
+                eventData.endDate = convertToUserTimezone(eventData.endDate, eventData.sourceTimezone, userTimezone);
                 
                 // Ensure dates are valid
                 if (isNaN(eventData.startDate.getTime()) || isNaN(eventData.endDate.getTime())) {
